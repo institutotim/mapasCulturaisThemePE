@@ -48,8 +48,32 @@ class Theme extends Subsite\Theme{
         });
     }
 
-    protected function _publishAssets() {
-        $this->jsObject['assets']['logo-instituicao'] = $this->asset('img/logo-instituicao.png', false);
-    }
+    protected function _getFilters(){
+        $en_municipio_filter = [
+            'fieldType' => 'text',
+            'label' => 'Município',
+            'isInline' => false,
+            'isArray' => false,
+            'placeholder' => 'Selecione os Municípios',
+            'filter' => [
+                'param' => 'En_Municipio',
+                'value' => 'ILIKE(*{val}*)'
+            ]
+        ];
 
+        $ent_filters = parent::_getFilters();
+        $mod_filters = [];
+        foreach ($ent_filters as $entity => $filters) {
+            $mod_filters[$entity] = [];
+            if (in_array($entity, ['space', 'agent'])){
+                $mod_filters[$entity][] = $en_municipio_filter;
+            }
+            foreach ($filters as $filter)
+                if (!(isset($filter['fieldType']) && $filter['fieldType'] === 'checkbox-verified'))
+                    $mod_filters[$entity][] = $filter;
+        }
+
+        return $mod_filters;
+
+}
 }
