@@ -46,6 +46,22 @@ class Theme extends Subsite\Theme{
         $app->hook('view.render(<<*>>):before', function() use($app) {
             $this->_publishAssets();
         });
+
+        $that = $this;
+
+
+        $app->hook('subsite.applyConfigurations:after', function(&$config) use($that){
+            $theme_path = $that::getThemeFolder() . '/';
+            if (file_exists($theme_path . 'conf-base.php')) {
+                $theme_config = require $theme_path . 'conf-base.php';
+                $config = array_merge($config, $theme_config);
+            }
+            if (file_exists($theme_path . 'config.php')) {
+                $theme_config = require $theme_path . 'config.php';
+                $config = array_merge($config, $theme_config);
+            }
+        });
+
     }
 
     protected function _getFilters(){
